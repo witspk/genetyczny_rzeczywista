@@ -277,7 +277,15 @@ class Populacja:
         new_pop.population.extend(other.population)
         return new_pop
 
+    def findBest(self):
+        r = 1000000
+        for x in self.population:
+            v = self.f.value(x.chromo[0], x.chromo[1])
+            if v < r:
+                r = v
+            best = x
 
+        return Osobnik(best.chromo[0], best.chromo[1])
 
 
 

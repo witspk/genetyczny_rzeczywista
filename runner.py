@@ -23,8 +23,5 @@ def runner(wielkosc_populacji=100,
                                      rodzaj_mutacji,
                                      p_mutacji,
                                      liczba_elitarnych))
-    print("Wiekość populacji pierwszej epoki:"+str(len(epoki[0].population)))
-    #epoki[0].print()
-    print("Wiekość populacji ostatniej epoki:"+str(len(epoki[liczba_epok - 1].population)))
-    #epoki[liczba_epok - 1].print()
+
     epoki[liczba_epok - 1].best_number(1).print()

@@ -87,13 +87,12 @@ class Ui_Dialog(object):
         f = FitnessFunction()
         for populacja in epoki:
             for osobnik in populacja.population:
-                decoded = osobnik.decode(f.a, f.b, f.a, f.b)
                 #wartości funkcji dla każdego osobnika w danej populacji
-                values.append(f.value(decoded[0], decoded[1]))
+                values.append(f.value(osobnik.chromo[0], osobnik.chromo[1]))
             else:
                 #najlepsza wartość funkcji dla danej populacji
-                best = populacja.findBest().decode(f.a, f.b, f.a, f.b)
-                bestValues.append(f.value(best[0], best[1]))
+                best = populacja.findBest()
+                bestValues.append(f.value(best.chromo[0], best.chromo[1]))
                 #średnia wartość funkcji dla danej populacji
                 means.append(sum(values)/len(values))
                 nominator = 0
@@ -156,7 +155,7 @@ class Ui_Dialog(object):
 
         for x in range(epNo):
             if x == 0:
-                epoki.append(Populacja(poNo, int(self.numberOfBits.text())))
+                epoki.append(Populacja(poNo))
             else:
                 epoki.append(epoki[x - 1]
                              .nowa_epoka(selectionMethod,
@@ -165,18 +164,16 @@ class Ui_Dialog(object):
                                          float(self.crossProbability.text()),
                                          mutationMethod,
                                          float(self.mutationProbability.text()),
-                                         float(self.inversionProbability.text()),
                                          int(self.eliteStrategyAmount.text())))
         endTime = time.time()
         self.generateFiles(epoki)
         best = epoki[epNo-1].findBest()
         f = FitnessFunction()
-        decoded = best.decode(f.a, f.b, f.a, f.b)
         messageBox = QMessageBox()
         messageBox.setWindowTitle("Message")
-        messageBox.setText("Solution: " + str(f.value(decoded[0], decoded[1])) + "\nFound at: x = ("
-                           + str(int(decoded[0])) + ", " + str(int(decoded[1])) +")\nReal values: " +
-                           str(decoded[0]) + ", " + str(decoded[1]) + "\nExecution time: " + str(endTime-startTime))
+        messageBox.setText("Solution: " + str(f.value(best.chromo[0], best.chromo[1])) + "\nFound at: x = ("
+                           + str(int(best.chromo[0])) + ", " + str(int(best.chromo[1])) +")\nReal values: " +
+                           str(best.chromo[0]) + ", " + str(best.chromo[1]) + "\nExecution time: " + str(endTime-startTime))
         messageBox.exec_()
 
 
