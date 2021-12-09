@@ -188,13 +188,15 @@ class Populacja:
             # krzyzowanie wylosowanych osobników
             o1 = self.population[a].chromo
             o2 = self.population[b].chromo
-            if (p < p_krzyzowania and check_for_heur(o1, o2)):
-                k = random.random()
-                new1 = k * o1[0] + (1 - k) * o2[0]
-                new2 = k * o2[1] + (1 - k) * o1[1]
+            if p < p_krzyzowania:
+                if check_for_heur(o1, o2):
+                    k = random.random()
+                    new1 = k * (o2[0] - o1[0]) + o1[0]
+                    new2 = k * (o2[1] - o1[1]) + o1[1]
 
                 new_pop.dodaj(Osobnik(new1, new2))
-
+            else:
+                new_pop.dodaj(o1)
         return new_pop
 
     def mutuj(self, rodzaj_mutacji, p_mutacji):
