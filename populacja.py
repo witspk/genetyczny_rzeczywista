@@ -17,11 +17,10 @@ class ECross(Enum):
     ARITHMETIC = 1
     HEURISTIC = 2
 
-# nie wiem czy dobre nazwy
+
 class EMutation(Enum):
     UNIFORM = 1
-    INDEX_CHANGE = 2
-    GAUSS = 3
+    GAUSS = 2
 
 
 class Populacja:
@@ -168,12 +167,20 @@ class Populacja:
 
     def mutacja_rownomierna(self, p_mutacji):
         new_pop = Populacja()
-        new_pop += self
-        return new_pop
-
-    def mutacja_zmiana(self, p_mutacji):
-        new_pop = Populacja()
-        new_pop += self
+        for x in self.population:
+            # losowanie prawdopodobienstwa
+            p = random.random()
+            # mutowanie
+            if p < p_mutacji:
+                # losowanie punktu mutowania
+                pp = random.random()
+                if pp < 0.5:
+                    o = Osobnik(random.uniform(self.f.a, self.f.b), x.chromo[1])
+                else:
+                    o = Osobnik(x.chromo[0], random.uniform(self.f.a, self.f.b))
+                new_pop.dodaj(o)
+            else:
+                new_pop.dodaj(x)
         return new_pop
 
     def mutacja_gaussa(self, p_mutacji):
