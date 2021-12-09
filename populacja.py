@@ -22,6 +22,11 @@ class EMutation(Enum):
     UNIFORM = 1
     GAUSS = 2
 
+def check_for_heur(o1, o2):
+    if isinstance(o1, Osobnik) and isinstance(o2, Osobnik):
+        if o2[0] > o1[0] and o2[1] > o1[1]:
+            return True
+    return False
 
 class Populacja:
     f = FitnessFunction()
@@ -139,27 +144,62 @@ class Populacja:
         else:
             pass
 
-    def krzyzowanie_arytmetyczne(self, p_krzyzowania, ilosc_po_krzyżowaniu):
+    def krzyzowanie_arytmetyczne(self, p_krzyzowania, ilosc_po_krzyżowaniu, k=0.5):
         new_pop = Populacja()
-        new_pop += self
-        for i in range(len(new_pop.population), ilosc_po_krzyżowaniu):
-            new_pop.dodaj(Osobnik(1,1))
+        while len(new_pop.population) < ilosc_po_krzyżowaniu and len(self.population) != 0:
+            # losowanie pary
+            a = 0
+            b = 0
+            l = len(self.population)
+            while a == b and l != 0:
+                a = random.randint(0, len(self.population) - 1)
+                b = random.randint(0, len(self.population) - 1)
+            # losowanie prawdopodobienstwa krzyżowania
+            p = random.random()
+            # krzyzowanie wylosowanych osobników
+            if (p < p_krzyzowania):
+                o1 = self.population[a].chromo
+                o2 = self.population[b].chromo
+
+                o1new1 = k * o1[0] + (1 - k) * o2[0]
+                o1new2 = k * o2[1] + (1 - k) * o1[1]
+                o2new1 = (1 - k) * o1[0] + k * o2[0]
+                o2new2 = (1 - k) * o2[1] + k * o1[1]
+
+                new1 = Osobnik(o1new1, o1new2)
+                new2 = Osobnik(o2new1, o2new2)
+                new_pop.dodaj(new1)
+                new_pop.dodaj(new2)
+
         return new_pop
 
     def krzyzowanie_heurystyczne(self, p_krzyzowania, ilosc_po_krzyżowaniu):
         new_pop = Populacja()
-        new_pop += self
-        for i in range(len(new_pop), ilosc_po_krzyżowaniu):
-            new_pop.dodaj(Osobnik(1, 1))
+        while len(new_pop.population) < ilosc_po_krzyżowaniu and len(self.population) != 0:
+            # losowanie pary
+            a = 0
+            b = 0
+            l = len(self.population)
+            while a == b and l != 0:
+                a = random.randint(0, len(self.population) - 1)
+                b = random.randint(0, len(self.population) - 1)
+            # losowanie prawdopodobienstwa krzyżowania
+            p = random.random()
+            # krzyzowanie wylosowanych osobników
+            o1 = self.population[a].chromo
+            o2 = self.population[b].chromo
+            if (p < p_krzyzowania and check_for_heur(o1, o2)):
+                k = random.random()
+                new1 = k * o1[0] + (1 - k) * o2[0]
+                new2 = k * o2[1] + (1 - k) * o1[1]
+
+                new_pop.dodaj(Osobnik(new1, new2))
+
         return new_pop
-
-
 
     def mutuj(self, rodzaj_mutacji, p_mutacji):
         if rodzaj_mutacji == EMutation.UNIFORM:
             return self.mutacja_rownomierna(p_mutacji)
-        elif rodzaj_mutacji == EMutation.INDEX_CHANGE:
-            return self.mutacja_zmiana(p_mutacji)
         elif rodzaj_mutacji == EMutation.GAUSS:
             return self.mutacja_gaussa(p_mutacji)
         else:
