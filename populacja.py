@@ -1,6 +1,6 @@
 import random
 from enum import Enum
-from math import ceil, floor
+from math import ceil, floor, sqrt
 
 from osobnik import Osobnik
 from FitnessFunction import FitnessFunction
@@ -172,7 +172,7 @@ class Populacja:
             p = random.random()
             # mutowanie
             if p < p_mutacji:
-                # losowanie punktu mutowania
+                # losowanie genu do mutowania
                 pp = random.random()
                 if pp < 0.5:
                     o = Osobnik(random.uniform(self.f.a, self.f.b), x.chromo[1])
@@ -184,8 +184,38 @@ class Populacja:
         return new_pop
 
     def mutacja_gaussa(self, p_mutacji):
+        s = 0
+        n = 0
+        w = 0
+        for x in self.population:
+            s += x.chromo[0] + x.chromo[1]
+            n += 2
+
+        avg = s/n
+        for x in self.population:
+            w += (pow(x.chromo[0] - avg, 2) + pow(x.chromo[1] - avg, 2)) / n
+
+        std_deviation = sqrt(w)
+
         new_pop = Populacja()
-        new_pop += self
+        for x in self.population:
+            # losowanie prawdopodobienstwa
+            p = random.random()
+            # mutowanie
+            if p < p_mutacji:
+                x_new = x.chromo[0] + random.uniform(-std_deviation, std_deviation)
+                y_new = x.chromo[1] + random.uniform(-std_deviation, std_deviation)
+                if x_new < self.f.a or x_new > self.f.b:
+                    x_new = x.chromo[0]
+
+                if y_new < self.f.a or y_new > self.f.b:
+                    y_new = x.chromo[1]
+
+                o = Osobnik(x_new, y_new)
+                new_pop.dodaj(o)
+            else:
+                new_pop.dodaj(x)
+
         return new_pop
 
     def nowa_epoka(self, rodzaj_selekcji, parametr_selekcji, rodzaj_krzyzowania, p_krzyzowania, rodzaj_mutacji, p_mutacji,
